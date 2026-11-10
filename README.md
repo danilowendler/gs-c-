@@ -223,7 +223,7 @@ O SQLite não tem tipo próprio para `DateTimeOffset`, e o EF Core não consegue
 
 ### Pré-requisitos
 
-- .NET 8 SDK
+- .NET 8 SDK ou mais recente. Os projetos usam `RollForward=Major`, então também rodam em máquinas que só têm o .NET 9 ou o .NET 10 instalado.
 - Opcional: o serviço de previsão rodando em `http://localhost:8000` (repositório de SOA). Sem ele, o alerta vem dos totens.
 
 ### Passos
@@ -271,13 +271,49 @@ Cobrem as faixas do índice de calor, validações das entidades, o alerta do di
 
 ## Evidências
 
-Prints em [`docs/evidencias/`](docs/evidencias/):
+Prints da API rodando localmente, em [`docs/evidencias/`](docs/evidencias/).
 
-- `dotnet test` com todos os testes passando;
-- Swagger aberto;
-- `GET /api/alertas/hoje` com e sem o serviço de previsão no ar;
-- `GET /api/pontos`, `POST /api/pausas` e `GET /api/trabalhadores/1/pausas`;
-- o app mostrando os dados da API, sem o aviso de modo demonstração.
+### 1. Testes automatizados
+
+`dotnet test` com os 18 testes passando.
+
+![dotnet test](docs/evidencias/01_dotnet_test.png)
+
+### 2. Documentação no Swagger
+
+Todos os endpoints da API em `http://localhost:5000/swagger`.
+
+![Swagger](docs/evidencias/02_swagger.png)
+
+### 3. Alerta do dia com o serviço de previsão no ar
+
+`GET /api/alertas/hoje` consultando o serviço de previsão (SOA), que usa o modelo treinado com dados do INMET. A resposta traz `perigoso`, a `probabilidade` calculada pelo modelo e `fonte` indicando a previsão.
+
+![Alerta com previsão](docs/evidencias/03_alerta_com_previsao.png)
+
+### 4. Alerta do dia sem o serviço de previsão
+
+O mesmo endpoint com o serviço de previsão desligado. A API não quebra: calcula o alerta pelas leituras dos totens e informa essa `fonte`.
+
+![Alerta sem previsão](docs/evidencias/04_alerta_sem_previsao.png)
+
+### 5. Pontos Refresca
+
+`GET /api/pontos` devolvendo os pontos com endereço e horário, no formato usado pelo app.
+
+![GET pontos](docs/evidencias/05_get_pontos.png)
+
+### 6. Registro de pausa
+
+`POST /api/pausas` respondendo `201 Created` com a pausa salva. O horário é guardado em UTC.
+
+![POST pausa](docs/evidencias/06_post_pausa.png)
+
+### 7. Histórico de pausas
+
+`GET /api/trabalhadores/1/pausas` listando a pausa registrada no passo anterior.
+
+![GET pausas](docs/evidencias/07_get_pausas.png)
 
 ## Entregáveis da disciplina
 
@@ -287,7 +323,7 @@ Prints em [`docs/evidencias/`](docs/evidencias/):
 - [x] Async/await em toda a cadeia, inclusive a chamada HTTP (1,0)
 - [x] Qualidade do código: camadas, injeção de dependência, tratamento de erros, testes (2,0)
 - [x] Documentação dos endpoints (Swagger)
-- [ ] Evidências da aplicação em `docs/evidencias/`
+- [x] Evidências da aplicação em `docs/evidencias/`
 
 ## Dados
 
